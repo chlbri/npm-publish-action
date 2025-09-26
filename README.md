@@ -1,18 +1,18 @@
 # NPM Publish Action
 
-Une action GitHub composite qui simplifie la publication de packages NPM avec vérification intelligente des versions.
+A GitHub composite action that simplifies NPM package publishing with smart version checking.
 
-## 🚀 Fonctionnalités
+## 🚀 Features
 
-- 🧠 **Intelligent** : Publie uniquement si la version dans `package.json` diffère de la dernière version sur NPM
-- 🛠 **Configurable** : Personnalisez le comportement de vérification des versions, l'URL du registre et le chemin de votre package
-- 🔐 **Sécurisé** : Garde votre token d'authentification NPM secret
-- ⚡ **Rapide** : Basé sur l'action éprouvée `JS-DevTools/npm-publish@v3`
-- 📤 **Sorties détaillées** : Expose les anciens et nouveaux numéros de version, et le type de changement
+- 🧠 **Smart** : Only publishes if the version number in `package.json` differs from the latest on NPM
+- 🛠 **Configurable** : Customize the version checking behavior, registry URL, and package path
+- 🔐 **Secure** : Keeps your NPM authentication token secret
+- ⚡ **Fast** : Based on the proven `JS-DevTools/npm-publish@v3` action
+- 📤 **Detailed outputs** : Exposes old and new version numbers, and the type of change
 
-## 📋 Utilisation
+## 📋 Usage
 
-### Utilisation basique
+### Basic usage
 
 ```yaml
 name: Publish to NPM
@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
 ```
 
-### Utilisation avancée
+### Advanced usage
 
 ```yaml
 - name: Publish to NPM
@@ -55,7 +55,7 @@ jobs:
     dry-run: false
 ```
 
-### Publication vers GitHub Package Registry
+### Publishing to GitHub Package Registry
 
 ```yaml
 - name: Publish to GitHub Packages
@@ -66,28 +66,28 @@ jobs:
     access: public
 ```
 
-## 📖 Paramètres d'entrée
+## 📖 Input parameters
 
-| Nom | Type | Défaut | Description |
+| Name | Type | Default | Description |
 |-----|------|--------|-------------|
-| `token` | string | **requis** | Token d'authentification à utiliser avec le registre configuré |
-| `registry` | string | `https://registry.npmjs.org/` | URL du registre à utiliser |
-| `package` | string | Répertoire courant | Chemin vers un répertoire de package, un `package.json`, ou un `.tgz` à publier |
-| `tag` | string | `latest` | Tag de distribution pour la publication |
-| `access` | string | Défauts NPM | Visibilité du package (`public` ou `restricted`) |
-| `provenance` | boolean | `false` | Exécuter `npm publish` avec le flag `--provenance` |
-| `strategy` | string | `all` | Stratégie de publication (`all` ou `upgrade`) |
-| `ignore-scripts` | boolean | `true` | Exécuter `npm publish` avec le flag `--ignore-scripts` |
-| `dry-run` | boolean | `false` | Exécuter `npm publish` avec le flag `--dry-run` |
+| `token` | string | **required** | Authentication token to use with the configured registry |
+| `registry` | string | `https://registry.npmjs.org/` | Registry URL to use |
+| `package` | string | Current directory | Path to a package directory, a `package.json`, or a packed `.tgz` to publish |
+| `tag` | string | `latest` | Distribution tag for publishing |
+| `access` | string | NPM defaults | Package visibility (`public` or `restricted`) |
+| `provenance` | boolean | `false` | Run `npm publish` with the `--provenance` flag |
+| `strategy` | string | `all` | Publishing strategy (`all` or `upgrade`) |
+| `ignore-scripts` | boolean | `true` | Run `npm publish` with the `--ignore-scripts` flag |
+| `dry-run` | boolean | `false` | Run `npm publish` with the `--dry-run` flag |
 
-### Stratégies de publication
+### Publishing strategies
 
-- **`all`** (défaut) : Publie toute version qui n'existe pas encore dans le registre
-- **`upgrade`** : Publie uniquement si la version est une mise à niveau semver du `tag` demandé
+- **`all`** (default) : Publishes any version that does not yet exist in the registry
+- **`upgrade`** : Publishes only if the version is a semver upgrade of the requested `tag`
 
-## 📤 Sorties
+## 📤 Outputs
 
-Cette action expose plusieurs variables de sortie que vous pouvez utiliser dans les étapes suivantes de votre workflow :
+This action exposes several output variables that you can use in subsequent steps of your workflow:
 
 ```yaml
 - name: Publish to NPM
@@ -96,24 +96,24 @@ Cette action expose plusieurs variables de sortie que vous pouvez utiliser dans 
   with:
     token: ${{ secrets.NPM_TOKEN }}
 
-- name: Utiliser les sorties
+- name: Use outputs
   if: ${{ steps.publish.outputs.type }}
   run: |
-    echo "Package publié : ${{ steps.publish.outputs.id }}"
-    echo "Type de release : ${{ steps.publish.outputs.type }}"
+    echo "Package published: ${{ steps.publish.outputs.id }}"
+    echo "Release type: ${{ steps.publish.outputs.type }}"
 ```
 
-| Nom | Type | Description |
+| Name | Type | Description |
 |-----|------|-------------|
-| `id` | string | Identifiant du package : `${name}@${version}` ou vide si pas de release |
-| `type` | string | Type de release semver, `initial` si première release, `different` si autre changement, ou vide si pas de release |
-| `name` | string | Nom du package |
-| `version` | string | Version du package |
-| `old-version` | string | Version précédemment publiée sur le `tag` ou vide si aucune version précédente |
-| `tag` | string | Tag de distribution vers lequel le package a été publié |
-| `access` | string | Niveau d'accès avec lequel le package a été publié |
-| `registry` | string | Registre vers lequel le package a été publié |
-| `dry-run` | boolean | Si `npm publish` a été exécuté en mode "dry run" |
+| `id` | string | Package identifier: `${name}@${version}` or empty if no release |
+| `type` | string | Semver release type, `initial` if first release, `different` if other change, or empty if no release |
+| `name` | string | Package name |
+| `version` | string | Package version |
+| `old-version` | string | Previously published version on the `tag` or empty if no previous version |
+| `tag` | string | Distribution tag the package was published to |
+| `access` | string | Access level the package was published with |
+| `registry` | string | Registry the package was published to |
+| `dry-run` | boolean | Whether `npm publish` was run in "dry run" mode |
 
 ## 🔧 Exemples d'utilisation
 

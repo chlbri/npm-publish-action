@@ -27,34 +27,73 @@ inputs:
   access:
     description: 'Whether the package should be publicly visible or restricted (public/restricted)'
     required: false
+    default: 'public'
     type: string
   
   provenance:
     description: 'Run npm publish with the --provenance flag to add provenance statements'
     required: false
-    default: 'false'
+    default: false
     type: boolean
   
   strategy:
     description: 'Publish strategy: "all" to publish all unique versions, "upgrade" for only semver upgrades'
     required: false
-    default: 'all'
+    default: 'upgrade'
     type: string
   
   ignore-scripts:
     description: 'Run npm publish with the --ignore-scripts flag as a security precaution'
     required: false
-    default: 'true'
+    default: true
     type: boolean
   
   dry-run:
     description: 'Run npm publish with the --dry-run flag to prevent publication'
     required: false
-    default: 'false'
+    default: false
     type: boolean
+
+outputs:
+  id:
+    description: 'Package identifier of the release: ${name}@${version} or empty if no release'
+    value: ${{ steps.publish.outputs.id }}
+  
+  type:
+    description: 'Semver release type, initial if first release, different if other change, or empty if no release'
+    value: ${{ steps.publish.outputs.type }}
+  
+  name:
+    description: 'Name of the package'
+    value: ${{ steps.publish.outputs.name }}
+  
+  version:
+    description: 'Version of the package'
+    value: ${{ steps.publish.outputs.version }}
+  
+  old-version:
+    description: 'Previously published version on tag or empty if no previous version on tag'
+    value: ${{ steps.publish.outputs.old-version }}
+  
+  tag:
+    description: 'Distribution tag the package was published to'
+    value: ${{ steps.publish.outputs.tag }}
+  
+  access:
+    description: 'Access level the package was published with, or default if scoped-package defaults were used'
+    value: ${{ steps.publish.outputs.access }}
+  
+  registry:
+    description: 'Registry the package was published to'
+    value: ${{ steps.publish.outputs.registry }}
+  
+  dry-run:
+    description: 'Whether npm publish was run in dry run mode'
+    value: ${{ steps.publish.outputs.dry-run }}
 
 runs:
   using: 'composite'
+  
   steps:
     - uses: JS-DevTools/npm-publish@v3
       id: publish
