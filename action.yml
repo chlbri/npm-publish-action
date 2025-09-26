@@ -1,31 +1,85 @@
-name: pnpmi
-description: 'Default pnpm create action'
+name: npm-publish-action
+description: 'GitHub Action for publishing packages to NPM with smart version checking'
 
 inputs:
-  branch:
-    token: 'Your NPM TOKEN'
+  token:
+    description: 'Authentication token to use with the configured registry'
     required: true
     type: string
+  
+  registry:
+    description: 'Registry URL to use'
+    required: false
+    default: 'https://registry.npmjs.org/'
+    type: string
+  
+  package:
+    description: 'Path to a package directory, a package.json, or a packed .tgz to publish'
+    required: false
+    type: string
+  
+  tag:
+    description: 'Distribution tag to publish to'
+    required: false
+    default: 'latest'
+    type: string
+  
+  access:
+    description: 'Whether the package should be publicly visible or restricted (public/restricted)'
+    required: false
+    type: string
+  
+  provenance:
+    description: 'Run npm publish with the --provenance flag to add provenance statements'
+    required: false
+    default: 'false'
+    type: boolean
+  
+  strategy:
+    description: 'Publish strategy: "all" to publish all unique versions, "upgrade" for only semver upgrades'
+    required: false
+    default: 'all'
+    type: string
+  
+  ignore-scripts:
+    description: 'Run npm publish with the --ignore-scripts flag as a security precaution'
+    required: false
+    default: 'true'
+    type: boolean
+  
+  dry-run:
+    description: 'Run npm publish with the --dry-run flag to prevent publication'
+    required: false
+    default: 'false'
+    type: boolean
 
 runs:
   using: 'composite'
-
   steps:
     - uses: JS-DevTools/npm-publish@v3
-        id: publish
-        name: Publish
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
-          strategy: upgrade
+      id: publish
+      name: Publish to NPM
+      with:
+        token: ${{ inputs.token }}
+        registry: ${{ inputs.registry }}
+        package: ${{ inputs.package }}
+        tag: ${{ inputs.tag }}
+        access: ${{ inputs.access }}
+        provenance: ${{ inputs.provenance }}
+        strategy: ${{ inputs.strategy }}
+        ignore-scripts: ${{ inputs.ignore-scripts }}
+        dry-run: ${{ inputs.dry-run }}
           
-    - name: Check - updated
+    - name: Check - Package Updated
       if: ${{ steps.publish.outputs.type }}
-      run:
-        echo "${{ steps.publish.outputs.name }} Version changed from ${{
-        steps.publish.outputs.old-version }} to ${{
-        steps.publish.outputs.version }}"
+      shell: bash
+      run: |
+        echo "${{ steps.publish.outputs.name }} version changed from ${{ steps.publish.outputs.old-version }} to ${{ steps.publish.outputs.version }}"
+        echo "Release type: ${{ steps.publish.outputs.type }}"
+        echo "Registry: ${{ steps.publish.outputs.registry }}"
+        echo "Tag: ${{ steps.publish.outputs.tag }}"
 
-    - name: Check - not updated
+    - name: Check - Package Not Updated
       if: ${{ ! steps.publish.outputs.type }}
-      run: echo "Remain the same! - ${{ steps.publish.outputs.version }}"
+      shell: bash
+      run: echo "Package remains the same! - ${{ steps.publish.outputs.name }}@${{ steps.publish.outputs.version }}"
