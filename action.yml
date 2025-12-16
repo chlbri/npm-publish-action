@@ -95,7 +95,7 @@ runs:
   using: 'composite'
   
   steps:
-    - uses: JS-DevTools/npm-publish@v3
+    - uses: JS-DevTools/npm-publish@v4
       id: publish
       name: Publish to NPM
       with:
